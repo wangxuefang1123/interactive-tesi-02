@@ -13,6 +13,8 @@ let gravity = 0.8;
 let bounce = -0.6;
 let groundY;
 
+let firstClick = true; // 第一次点击标记
+
 // =============================
 // 预加载图片
 // =============================
@@ -95,11 +97,9 @@ function drawBackgroundCover(img) {
   let drawW, drawH;
 
   if (imgRatio > canvasRatio) {
-    // 图片比屏幕宽 → 高度撑满
     drawH = height;
     drawW = height * imgRatio;
   } else {
-    // 图片比屏幕窄 → 宽度撑满
     drawW = width;
     drawH = width / imgRatio;
   }
@@ -108,20 +108,32 @@ function drawBackgroundCover(img) {
 }
 
 // =============================
-// 点击橘子
+// 点击事件
 // =============================
 function mousePressed() {
-  // 触摸设备进入全屏
-  let fs = fullscreen();
-  fullscreen(!fs);
+  let clickedOnOrange = false;
 
   for (let o of oranges) {
     let d = dist(mouseX, mouseY, o.x, o.y);
     if (d < orangeW / 2) {
       o.falling = true;
       o.vy = 0;
+      clickedOnOrange = true; // 点击到橘子
     }
   }
+
+  // 如果没有点击到橘子，并且是触摸设备第一次点击 → 进入全屏
+  if (!clickedOnOrange && firstClick && isTouchDevice()) {
+    fullscreen(true);
+    firstClick = false;
+  }
+}
+
+// =============================
+// 简单判断是否触摸设备
+// =============================
+function isTouchDevice() {
+  return "ontouchstart" in window || navigator.maxTouchPoints > 0;
 }
 
 // =============================
